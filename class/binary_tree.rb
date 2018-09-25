@@ -1,16 +1,16 @@
 module BinTree
   class Node
-    attr_accessor :key, :value, :left, :right
+    attr_accessor :value, :left, :right, :parrent
 
-    def initialize(key, value)
-      @key = key
+    def initialize(value)
       @value = value
       @left =  nil
       @right = nil
+      @parrent = nil
     end
 
     def inspect
-      'key: ' + key.to_s + ' value: ' + value.to_s
+      value.to_s
     end
   end
 
@@ -21,39 +21,96 @@ module BinTree
       @root = nil
     end
 
-    def insert(key, value)
-      @root = insrt!(key, value, @root)
+    def insert(value)
+      if @root.nil?
+        @root = Node.new(value)
+        @root.parrent = nil
+      else
+        tmp = @root
+        prnt = nil
+
+        while tmp != nil
+          prnt = tmp
+          if value < tmp.value
+            tmp = tmp.left
+          else
+            tmp = tmp.right
+          end
+        end
+
+        if value < prnt.value
+          prnt.left = Node.new(value)
+          prnt.left.parrent = prnt
+        else
+          prnt.right = Node.new(value)
+          prnt.right.parrent = prnt
+        end
+      end
     end
 
     def remove(key)
-      @root = del!(key, @root)
+      @root = rm!(key, @root)
     end
 
-    def find(key, node = @root)
-      return nil if node.nil?
+    def rm!(value, node)
+      return nil if value.equal?(node.value) || node.nil?
 
-      return node.value if key.equal?(node.key)
-      val = find(key, node.left) if key < node.key
-      val = find(key, node.right) if key > node.key
-      val
+      if value > node.value
+        node.right = rm!(value, node.right)
+      elsif value < node.value
+        node.left = rm!(value, node.left)
+      end
+      node
     end
 
-    def min(node = @root)
-      return node if node.left.nil?
-      min(node.left)
-    end
+    def navigation
+      node = @root
 
-    def max(node = @root)
-      return node if node.right.nil?
-      max(node.right)
-    end
+      loop do
+        system('clear')
 
-    def prefix_traverse(node = @root)
-      return nil if node.nil?
+        puts 'usage : '
+        puts '  w         - go to parrent'
+        puts '  a         - go to left'
+        puts '  d         - go to right'
+        puts '  exit      - return'
+        puts '---------------------------'
 
-      puts node.inspect
-      prefix_traverse(node.left) unless node.left.nil?
-      prefix_traverse(node.right) unless node.right.nil?
+        if !@root.nil?
+          puts "its root\n" if node.equal?(@root)
+
+          print 'parrent: '
+          puts node.equal?(@root) ? 'nil' : node.parrent.inspect
+          puts 'current: ' + node.inspect
+
+          if node.left.nil? && node.right.nil?
+            puts 'left: empty | right: empty'
+          elsif node.left.nil?
+            puts 'left: empty | right: ' + node.right.inspect
+          elsif node.right.nil?
+            puts 'left: ' + node.left.inspect + ' | right: empty'
+          else
+            puts 'left: ' + node.left.inspect + ' | right: ' + node.right.inspect
+          end
+        else
+          puts 'IsEmpty'
+        end
+
+        print '>> '
+        str = gets.chomp.to_s
+
+        node = case str
+               when 'w'
+                 node.equal?(@root) ? node : node.parrent
+               when 'a'
+                 (node.left.nil?) ? node : node.left
+               when 'd'
+                 (node.right.nil?) ? node : node.right
+               else
+                 node
+               end
+        break if str.eql?('exit')
+      end
     end
 
     def infix_traverse(node = @root)
@@ -64,52 +121,5 @@ module BinTree
       infix_traverse(node.right) unless node.right.nil?
     end
 
-    def postfix_traverse(node = @root) #
-      return nil if node.nil?
-
-      postfix_traverse(node.left) unless node.left.nil?
-      postfix_traverse(node.right) unless node.right.nil?
-      puts node.inspect
-    end
-
-    private
-
-    def insrt!(key, value, node)
-      if node.nil?
-        return Node.new(key, value)
-      elsif key < node.key
-        node.left = insrt!(key, value, node.left)
-      elsif key > node.key
-        node.right = insrt!(key, value, node.right)
-      else
-        node.value = value
-      end
-      node
-    end
-
-    def del!(key, node)
-      return nil if node.nil?
-
-      if key > node.key
-        node.right = del!(key, node.right)
-      elsif key < node.key
-        node.left = del!(key, node.left)
-      elsif key.equal?(node.key)
-        return nil if node.left.nil? && node.right.nil? # Если нет поддеревьев
-        return node.left if node.right.nil? # Если есть только левое поддерево
-        return node.right if node.left.nil? # Если есть только правое поддерево
-
-        low_left_node = low_node(node.right) # Если есть два поддерева
-        node.key = low_left_node.key
-        node.value = low_left_node.value
-        node.right = del!(low_left_node.key, node.right)
-        return node
-      end
-      node
-    end
-
-    def low_node(node)
-      node.left.nil? ? node : min(node.left)
-    end
   end
 end
