@@ -1,4 +1,6 @@
 module BinTree
+  require 'io/console'
+
   class Node
     attr_accessor :value, :left, :right, :parrent
 
@@ -52,17 +54,6 @@ module BinTree
       @root = rm!(key, @root)
     end
 
-    def rm!(value, node)
-      return nil if value.equal?(node.value) || node.nil?
-
-      if value > node.value
-        node.right = rm!(value, node.right)
-      elsif value < node.value
-        node.left = rm!(value, node.left)
-      end
-      node
-    end
-
     def navigation
       node = @root
 
@@ -70,13 +61,13 @@ module BinTree
         system('clear')
 
         puts 'usage : '
-        puts '  w         - go to parrent'
-        puts '  a         - go to left'
-        puts '  d         - go to right'
-        puts '  exit      - return'
+        puts '  [w] - go to parrent'
+        puts '  [a] - go to left'
+        puts '  [d] - go to right'
+        puts '  [x] - return'
         puts '---------------------------'
 
-        if !@root.nil?
+        unless @root.nil?
           puts "its root\n" if node.equal?(@root)
 
           print 'parrent: '
@@ -97,7 +88,7 @@ module BinTree
         end
 
         print '>> '
-        str = gets.chomp.to_s
+        str = STDIN.getch.chomp.to_s
 
         node = case str
                when 'w'
@@ -109,7 +100,7 @@ module BinTree
                else
                  node
                end
-        break if str.eql?('exit')
+        break if str.eql?('x')
       end
     end
 
@@ -121,5 +112,17 @@ module BinTree
       infix_traverse(node.right) unless node.right.nil?
     end
 
+    private
+
+    def rm!(value, node)
+      return nil if value.equal?(node.value) || node.nil?
+
+      if value > node.value
+        node.right = rm!(value, node.right)
+      elsif value < node.value
+        node.left = rm!(value, node.left)
+      end
+      node
+    end
   end
 end
