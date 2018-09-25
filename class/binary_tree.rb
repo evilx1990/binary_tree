@@ -8,14 +8,17 @@ module BinTree
       @left =  nil
       @right = nil
     end
+
+    def inspect
+      'key: ' + key.to_s + ' value: ' + value.to_s
+    end
   end
 
   class Tree
-    attr_accessor :root, :count
+    attr_accessor :root
 
     def initialize
       @root = nil
-      @count = 0
     end
 
     def insert(key, value)
@@ -35,10 +38,20 @@ module BinTree
       val
     end
 
+    def min(node = @root)
+      return node if node.left.nil?
+      min(node.left)
+    end
+
+    def max(node = @root)
+      return node if node.right.nil?
+      max(node.right)
+    end
+
     def prefix_traverse(node = @root)
       return nil if node.nil?
 
-      puts node.key.to_s + ' ' + node.value.to_s
+      puts node.inspect
       prefix_traverse(node.left) unless node.left.nil?
       prefix_traverse(node.right) unless node.right.nil?
     end
@@ -47,18 +60,17 @@ module BinTree
       return nil if node.nil?
 
       infix_traverse(node.left) unless node.left.nil?
-      puts node.key.to_s + ' ' + node.value.to_s
+      puts node.inspect
       infix_traverse(node.right) unless node.right.nil?
     end
 
-    def postfix_traverse(node = @root)
+    def postfix_traverse(node = @root) #
       return nil if node.nil?
 
       postfix_traverse(node.left) unless node.left.nil?
       postfix_traverse(node.right) unless node.right.nil?
-      puts node.key.to_s + ' ' + node.value.to_s
+      puts node.inspect
     end
-
 
     private
 
@@ -69,6 +81,8 @@ module BinTree
         node.left = insrt!(key, value, node.left)
       elsif key > node.key
         node.right = insrt!(key, value, node.right)
+      else
+        node.value = value
       end
       node
     end
@@ -85,17 +99,16 @@ module BinTree
         return node.left if node.right.nil? # Если есть только левое поддерево
         return node.right if node.left.nil? # Если есть только правое поддерево
 
-        low_left_node = low_left(node) # Если есть два поддерева
+        low_left_node = low_node(node.right) # Если есть два поддерева
         node.key = low_left_node.key
         node.value = low_left_node.value
         node.right = del!(low_left_node.key, node.right)
         return node
       end
-
       node
     end
 
-    def low_left(node)
+    def low_node(node)
       node.left.nil? ? node : min(node.left)
     end
   end
