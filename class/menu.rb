@@ -1,52 +1,39 @@
+# frozen_string_literal:true
+
 require_relative './binary_tree.rb'
 
 class Menu
   def initialize
     @tree = BinTree::Tree.new
-    @tree.insert(10)
-    @tree.insert(8)
-    @tree.insert(6)
-    @tree.insert(4)
-    @tree.insert(2)
-    @tree.insert(0)
-    @tree.insert(9)
-    @tree.insert(7)
-    @tree.insert(5)
-    @tree.insert(3)
-    @tree.insert(1)
-    @tree.insert(12)
-    @tree.insert(14)
-    @tree.insert(16)
-    @tree.insert(18)
-    @tree.insert(20)
-    @tree.insert(11)
-    @tree.insert(13)
-    @tree.insert(15)
-    @tree.insert(17)
-    @tree.insert(19)
+    test = [10, 8, 6, 4, 2, 9, 7, 5, 3, 1, 12, 14, 16, 18, 20, 11, 13, 15, 17]
+    test.each { |it| @tree.insert(it) }
   end
 
   def run
     loop do
       system('clear')
+      puts "1 - add\n2 - delete\n3 - navigation\n4 - print\nx - exit"
 
-      puts '1 - add'
-      puts '2 - delete'
-      puts '3 - navigation'
-      puts '0 - exit'
-
-      choose = gets.to_i
+      choose = gets.chomp.to_s
 
       system('clear')
-      case choose
-      when 1
-        add
-      when 2
-        delete
-      when 3
-        navigator
-      end
-      break if choose == 0
+      choice(choose)
+      break if choose.eql?('x')
+    end
+  end
+
+  private
+
+  def choice(choose)
+    case choose
+    when '1'
+      add
+    when '2'
+      delete
+    when '3'
+      navigator
+    when '4'
+      show_all
     end
   end
 
@@ -64,5 +51,11 @@ class Menu
 
   def navigator
     @tree.navigation
+  end
+
+  def show_all
+    @tree.infix_traverse
+    puts "\npress any key"
+    STDIN.getch.to_s
   end
 end

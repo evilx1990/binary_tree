@@ -1,13 +1,8 @@
-# Реализовать класс бинарного дерева с возможностью навигации и тд.
-# В кратце в лучших традициях структуры
+# Frozen_string_literal:true
 
 require_relative './class/binary_tree.rb'
 require_relative './class/menu.rb'
+require 'io/console'
 
 m = Menu.new
-
 m.run
-
-
-# tree.infix_traverse
-#

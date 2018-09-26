@@ -1,14 +1,14 @@
+# Frozen_string_literal:true
+
 module BinTree
-  require 'io/console'
-
   class Node
-    attr_accessor :value, :left, :right, :parrent
+    attr_accessor :value, :left, :right, :parent
 
-    def initialize(value)
+    def initialize(value, parent)
       @value = value
+      @parent = parent
       @left =  nil
       @right = nil
-      @parrent = nil
     end
 
     def inspect
@@ -24,82 +24,21 @@ module BinTree
     end
 
     def insert(value)
-      if @root.nil?
-        @root = Node.new(value)
-        @root.parrent = nil
-      else
-        tmp = @root
-        prnt = nil
-
-        while tmp != nil
-          prnt = tmp
-          if value < tmp.value
-            tmp = tmp.left
-          else
-            tmp = tmp.right
-          end
-        end
-
-        if value < prnt.value
-          prnt.left = Node.new(value)
-          prnt.left.parrent = prnt
-        else
-          prnt.right = Node.new(value)
-          prnt.right.parrent = prnt
-        end
-      end
+      @root = new_node!(value, @root, nil)
     end
 
-    def remove(key)
-      @root = rm!(key, @root)
+    def remove(value)
+      @root = rm_node!(value, @root)
     end
 
     def navigation
       node = @root
 
       loop do
-        system('clear')
+        print_node(node)
+        str = STDIN.getch.to_s
+        node = nxt(str, node) unless @root.nil?
 
-        puts 'usage : '
-        puts '  [w] - go to parrent'
-        puts '  [a] - go to left'
-        puts '  [d] - go to right'
-        puts '  [x] - return'
-        puts '---------------------------'
-
-        unless @root.nil?
-          puts "its root\n" if node.equal?(@root)
-
-          print 'parrent: '
-          puts node.equal?(@root) ? 'nil' : node.parrent.inspect
-          puts 'current: ' + node.inspect
-
-          if node.left.nil? && node.right.nil?
-            puts 'left: empty | right: empty'
-          elsif node.left.nil?
-            puts 'left: empty | right: ' + node.right.inspect
-          elsif node.right.nil?
-            puts 'left: ' + node.left.inspect + ' | right: empty'
-          else
-            puts 'left: ' + node.left.inspect + ' | right: ' + node.right.inspect
-          end
-        else
-          puts 'IsEmpty'
-        end
-
-        print '>> '
-        str = STDIN.getch.chomp.to_s
-
-        node = case str
-               when 'w'
-                 node.equal?(@root) ? node : node.parrent
-               when 'a'
-                 (node.left.nil?) ? node : node.left
-               when 'd'
-                 (node.right.nil?) ? node : node.right
-               else
-                 node
-               end
         break if str.eql?('x')
       end
     end
@@ -108,21 +47,70 @@ module BinTree
       return nil if node.nil?
 
       infix_traverse(node.left) unless node.left.nil?
-      puts node.inspect
+      print node.inspect + ' '
       infix_traverse(node.right) unless node.right.nil?
     end
 
     private
 
-    def rm!(value, node)
-      return nil if value.equal?(node.value) || node.nil?
+    def new_node!(value, node, parent)
+      return Node.new(value, parent) if node.nil?
 
-      if value > node.value
-        node.right = rm!(value, node.right)
-      elsif value < node.value
-        node.left = rm!(value, node.left)
+      if value < node.value
+        node.left = new_node!(value, node.left, node)
+      elsif value >= node.value
+        node.right = new_node!(value, node.right, node)
       end
       node
+    end
+
+    def rm_node!(value, node)
+      return nil if value.equal?(node.value) || node.nil?
+
+      if value < node.value
+        node.left = rm_node!(value, node.left)
+      elsif value > node.value
+        node.right = rm_node!(value, node.right)
+      end
+      node
+    end
+
+    def print_node(node)
+      system('clear')
+
+      puts 'usage : '
+      puts '  [w] - go to parent'
+      puts '  [a] - go to left'
+      puts '  [d] - go to right'
+      puts '  [x] - return'
+      puts '---------------------------'
+
+      if !@root.nil?
+        puts 'its root' if node.equal?(@root)
+        print 'parent: '
+        puts node.equal?(@root) ? 'nil' : node.parent.inspect
+        puts 'current: ' + node.inspect
+
+        print 'left: '
+        print node.left.nil? ? 'empty' : node.left.inspect
+        print ' | right: '
+        puts node.right.nil? ? 'empty' : node.right.inspect
+      else
+        puts 'IsEmpty'
+      end
+    end
+
+    def nxt(str, node)
+      case str
+      when 'w'
+        node.equal?(@root) ? node : node.parent
+      when 'a'
+        node.left.nil? ? node : node.left
+      when 'd'
+        node.right.nil? ? node : node.right
+      else
+        node
+      end
     end
   end
 end
