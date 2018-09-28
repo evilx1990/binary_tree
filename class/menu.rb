@@ -4,7 +4,7 @@ require_relative './binary_tree.rb'
 
 class Menu
   def initialize
-    @tree = BinTree::Tree.new
+    @tree = Tree.new
     test = [10, 8, 6, 4, 2, 9, 7, 5, 3, 1, 12, 14, 16, 18, 20, 11, 13, 15, 17]
     test.each { |it| @tree.insert(it) }
   end
